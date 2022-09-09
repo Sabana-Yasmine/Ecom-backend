@@ -3,11 +3,11 @@ const bcrypt = require ("bcrypt");
 const productSchema = require ("../product/product-model");
 const database = require ('../database/db');
 const Product = require("./product-model");
-const {Auth} = require ("../user/auth");
+//const {isAdmin, isValid} = require ("../user/auth");
 
 //Create product
 
-router.post("/addproduct" ,Auth, async(req,res) =>{
+router.post("/addproduct" , async(req,res) =>{
  try{
 
     const productDetails = req.body
@@ -22,7 +22,7 @@ router.post("/addproduct" ,Auth, async(req,res) =>{
 
 // read specific product
 
-router.get("/getproduct",async(req,res) =>{
+router.get("/getproduct", async(req,res) =>{
     try{        
 
         const productDetails = await productSchema.find(req.query).exec()
@@ -35,7 +35,7 @@ router.get("/getproduct",async(req,res) =>{
 
 //read all product
 
-router.get("/getallproduct",async(req,res) =>{
+router.get("/getallproduct", async(req,res) =>{
     try{        
 
         const productDetails = await productSchema.find().exec()
@@ -48,7 +48,7 @@ router.get("/getallproduct",async(req,res) =>{
 
 //update product
 
-router.put("/updateproduct",Auth,async(req,res) =>{
+router.put("/updateproduct",async(req,res) =>{
     try{
     let condition = req.query
     let updateData = req.body
@@ -63,7 +63,7 @@ router.put("/updateproduct",Auth,async(req,res) =>{
 
 //Delete Product
 
-router.delete("/deleteproduct",Auth,async(req,res) =>{
+router.delete("/deleteproduct",async(req,res) =>{
     try{
         const productDetails = await productSchema.findOneAndDelete(req.query).exec()
         return res.status(200).json({"status": "success", "message":"product deleted successfully"})

@@ -62,11 +62,11 @@ router.get('/verify',async(req,res)=>{
   console.log("verifying email");
   let email = await User.findOne({email:req.query.email}).exec();
   if(email){
-    let status = await User.findOneAndUpdate({email:req.query.email},{activate:true},{new:true}).exec();
-    if(status){
+    let status = await User.findOneAndUpdate({email:req.query.email},{active:true},{new:true}).exec();
+    if(status.active){
       res.status(200).send({message:"Email Verified Successfully"})
     }else{
-      res.status(200).send({message:"Please update your email id"})
+      res.status(200).send({message:"something wemt wrong !"})
     }
   }
 })
@@ -74,17 +74,18 @@ router.get('/verify',async(req,res)=>{
 //User_login
 
 router.post('/userlogin', async (req,res)=>{
-  console.log("logging in")
+  console.log(req.body)
   try{
+    console.log("user logging in")
       let email = req.body .email
       let password = req.body.password
-      await userSchema.find({email:email}).then(data=>{
+      await userSchema.findOne({email:email}).then(data=>{
           bcrypt.compare(password,data.password,function(err,result){
               if(err){
                   return res.json({"err" : err.message})
               }
               if(result){
-                  const token = jwt.sign({data},process.env.jwtkey,{expiresIn:"1m"});
+                  const token = jwt.sign({data},process.env.jwtkey,{expiresIn:"1h"});
                   console.log("token",token)
                   return res.json({"status" : "success",token})
               }else{
@@ -92,7 +93,7 @@ router.post('/userlogin', async (req,res)=>{
               }
           })
       }).catch(err=>{
-        return res.json({status :"failure" , message : "invalid mailid"})
+        return res.json({status :"failure" , message : err.message})
     })
 
   }catch(err){
@@ -102,14 +103,14 @@ router.post('/userlogin', async (req,res)=>{
 
 router.get("/tokenverify", async(req,res)=>{
   try{
-      let token = res.header("token")
+      let token = req.header("token")
       if(!token){
           return res.json({sataus : "failure", message : "token not received"})
       }
       const decode = jwt.verify(token,process.env.jwtkey);
       return res.json({status : "success" , "result" : decode})
   }catch(err){
-      return res,json({"err" : err.message})
+      return res.json({"err" : err.message})
   }
 })
 

@@ -1,6 +1,12 @@
 const mongoose = require("mongoose")
+const crypto = require ("crypto")
 
 const userSchema = new mongoose.Schema({
+
+    uuid : {
+        type : String,
+        required : false
+    },
     username : {
         type : String,
         required : true
@@ -15,28 +21,30 @@ const userSchema = new mongoose.Schema({
         required : true
     },
     active : {
-        type : String,
+        type : Boolean,
         default : false
     },
-    // phonenumber : {
-    //     type : String,
-    //     minLength : 10,
-    //     maxLength : 10,
-    //     required : true
-    // },
+    
     loginstatus : {
         type : Boolean,
         default :false,
     },
-    // role :{
-    //     type : String,
-    //     required : true
+    role :{
+        type : String,
+        required : true
 
-    // }
+    }
 },{
     timeStamps : true
-}
-)
+})
+
+// UUID creation
+
+userSchema.pre('save',function(next){
+    this.uuid="USER-"+crypto.pseudoRandomBytes(5).toString('hex').toUpperCase()
+    console.log(this.uuid);
+    next();
+});
 
 const user = mongoose.model("user", userSchema)
 
