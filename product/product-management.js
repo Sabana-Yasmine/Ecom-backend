@@ -73,5 +73,80 @@ router.delete("/deleteproduct",async(req,res) =>{
     
 })
 
+//using aggregation
+
+router.get("/specific-products" , async (req,res) => {
+    try {
+       let details = await productSchema.aggregate([
+        {
+            $match :{
+                uuid : req.query.uuid
+            }
+        },
+        {
+            $lookup:{
+                from:"products",
+                localField:"uuid",
+                foreignField:"uuid",
+                as:"specific-product-details"
+            }
+        },
+        {
+            $unwind:{
+                path : "$specific-product-details",
+                preserveNullAndEmptyArrays : true
+            }
+        },
+        {
+            $project:{
+                productName : 1,
+                productCategory :1,
+            }
+        }
+       ]) 
+       console.log(details)
+
+       if(details.length>=1){
+        return res.status(200).json({status : "success", message : "details of specific products are fetched successfully", result : details})
+       }else{
+        return res.status(200).json({status : "failure", message : "product details not found"})
+       }
+    } catch (error) {
+        console.log(error.message);
+        return res.status(400).json({status : "failure", message : error.message})
+    }
+})
+
+
+router.get("/filters", async (req,res) => {
+    try {
+        let h
+        
+    const filteredPrice = await productSchema.aggregate([
+        {
+            $match : {
+                $and : [{ price : {
+                    $gte : minPrice,
+                    $lte : maxPrice
+                 }}]
+            }
+        },{
+            $sort : {price : 1}
+        },{
+            $project : {
+                _id : 0,
+                productName : 1,
+                produductCategory : 1
+            }
+        }
+    ])
+
+    console.log("filteredPrice" , filteredPrice);
+   return res.status(200).json({message : "products filtered successfully", result : filteredPrice})
+} catch (error) {
+        console.log(error.message);
+        return res.status(500).json(error)
+    }
+})
 
 module.exports = router;

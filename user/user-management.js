@@ -12,9 +12,9 @@ const jwt = require("jsonwebtoken");
 router.post('/Register', async(req,res)=>{
     console.log (" User Register process started ");
     try{
-     let {username, email, password} = req.body;
+     let {username, email, password, role} = req.body;
      console.log("get values")
-        if(username && email && password){
+        if(username && email && password && role){
           console.log("check if all values are given")
             let emailData = await User.findOne({email : email}).exec()
 
