@@ -3,11 +3,11 @@ const bcrypt = require ("bcrypt");
 const productSchema = require ("../product/product-model");
 const database = require ('../database/db');
 const Product = require("./product-model");
-//const {isAdmin, isValid} = require ("../user/auth");
+const {isAdmin, isValid} = require ("../user/auth");
 
 //Create product
 
-router.post("/addproduct" , async(req,res) =>{
+router.post("/addproduct" , isAdmin, async(req,res) =>{
  try{
 
     const productDetails = req.body

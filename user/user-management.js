@@ -34,7 +34,7 @@ router.post('/Register', async(req,res)=>{
                  await sendEmail(email, "verify Email",html)
 
                  res.status(200).json({
-                     status : false,
+                     status : true,
                      message : "User registed successfully"
                    })
             }else{
